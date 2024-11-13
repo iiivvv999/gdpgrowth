@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+        }
+        .chart-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f8f8f8;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="gdpChart"></canvas>
+    </div>
+    <div class="controls">
+        <button onclick="toggleChartType('line')">切换为折线图</button>
+        <button onclick="toggleChartType('bar')">切换为柱状图</button>
+        <button onclick="toggleDataLabels()">显示/隐藏数据标签</button>
+    </div>
+
+    <script>
+        let showDataLabels = false;
+        let currentType = 'bar';
+        const ctx = document.getElementById('gdpChart').getContext('2d');
+        let chart;
+
+        const data = {
+            labels: ['1978-2007', '2008-2015', '2016-2019'],
+            datasets: [
+                {
+                    label: '人力资本',
+                    data: [4.11, 1.23, 0.18],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                },
+                {
+                    label: '资本产出比',
+                    data: [0.40, 3.26, 1.43],
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                },
+                {
+                    label: '全要素生产率',
+                    data: [5.52, 4.18, 4.99],
+                    backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                    borderColor: 'rgb(255, 206, 86)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'GDP增长率',
+                    data: [10.03, 8.68, 6.60],
+                    type: 'line',
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderWidth: 2,
+                    fill: false
+                }
+            ]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: '增长率 (%)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'GDP增长率及要素贡献分析',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    datalabels: {
+                        display: false,
+                        color: 'black',
+                        anchor: 'center',
+                        align: 'center',
+                        formatter: (value) => value.toFixed(2)
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        };
+
+        function createChart() {
+            if (chart) {
+                chart.destroy();
+            }
+            chart = new Chart(ctx, config);
+        }
+
+        function toggleChartType(type) {
+            currentType = type;
+            data.datasets.forEach((dataset, idx) => {
+                if (idx < 3) { // 前三个数据集
+                    dataset.type = type;
+                }
+            });
+            createChart();
+        }
+
+        function toggleDataLabels() {
+            showDataLabels = !showDataLabels;
+            config.options.plugins.datalabels.display = showDataLabels;
+            createChart();
+        }
+
+        createChart();
+    </script>
+</body>
+</html>
